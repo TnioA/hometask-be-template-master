@@ -8,7 +8,10 @@ app.set('sequelize', sequelize)
 app.set('models', sequelize.models)
 
 /**
- * @returns contract by id
+ * Returns a contract by id that belongs to the user
+ * @param {id}
+ * @example GET: /contracts/123
+ * @returns the contract
  */
 app.get('/contracts/:id', getProfile, async (req, res) => {
     const { Contract } = req.app.get('models');
@@ -27,7 +30,9 @@ app.get('/contracts/:id', getProfile, async (req, res) => {
 });
 
 /**
- * @returns a list of contracts belonging to a user
+ * Returns a list of contracts that belongs to the user
+ * @example GET: /contracts
+ * @returns a list of contracts
  */
 app.get('/contracts', getProfile, async (req, res) => {
     const { Contract } = req.app.get('models');
@@ -42,7 +47,10 @@ app.get('/contracts', getProfile, async (req, res) => {
 });
 
 /**
- * @returns all unpaid jobs for a user
+ * Returns all unpaid jobs that belongs to the user
+ * @param {id}
+ * @example GET: /jobs/unpaid
+ * @returns a list of jobs
  */
 app.get('/jobs/unpaid', getProfile, async (req, res) => {
     const { Job, Contract } = req.app.get('models');
@@ -62,11 +70,14 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
 });
 
 /**
- * @returns Pay for a job
+ * Realizes the payment of a job
+ * @param {jobId}
+ * @example POST: /jobs/123/pay
+ * @returns the confirmation message
  */
-app.post('/jobs/:job_id/pay', getProfile, async (req, res) => {
+app.post('/jobs/:jobId/pay', getProfile, async (req, res) => {
     const { Job, Contract, Profile } = req.app.get('models');
-    const { job_id } = req.params;
+    const { jobId } = req.params;
     const profileId = req.profile.id;
 
     // starting a new transaction
@@ -75,7 +86,7 @@ app.post('/jobs/:job_id/pay', getProfile, async (req, res) => {
     // getting the job
     const job = await Job.findOne({
         where: {
-            id: job_id,
+            id: jobId,
             paid: null,
             '$Contract.ClientId$': profileId
         },
@@ -102,7 +113,7 @@ app.post('/jobs/:job_id/pay', getProfile, async (req, res) => {
     // updating tables
     await Profile.increment({ balance: -amountToPay }, { where: { id: client.id }, lock: true, transaction });
     await Profile.increment({ balance: +amountToPay }, { where: { id: job.Contract.ContractorId }, lock: true, transaction });
-    await Job.update({ paid: 1, paymentDate: new Date() }, { where: { id: job_id }, lock: true, transaction });
+    await Job.update({ paid: 1, paymentDate: new Date() }, { where: { id: jobId }, lock: true, transaction });
 
     // finishing transaction
     await transaction.commit();
@@ -111,7 +122,11 @@ app.post('/jobs/:job_id/pay', getProfile, async (req, res) => {
 });
 
 /**
- * @returns ...
+ * Realizes a deposit at the user profile balance
+ * @param {userId}
+ * @param {depositValue}
+ * @example POST: /balances/deposit/123/amount/456
+ * @returns the confirmation message
  */
 app.post('/balances/deposit/:userId/amount/:depositValue', getProfile, async (req, res) => {
     const { Job, Contract, Profile } = req.app.get('models');
@@ -152,7 +167,11 @@ app.post('/balances/deposit/:userId/amount/:depositValue', getProfile, async (re
 });
 
 /**
- * @returns ...
+ * Returns the profession that earned the most money in the query time period requested
+ * @param {start}
+ * @param {end}
+ * @example GET: /admin/best-profession?start=2019-02-16&end=2024-02-16
+ * @returns the profession
  */
 app.get('/admin/best-profession', getProfile, async (req, res) => {
     const { Job, Contract, Profile } = req.app.get('models');
@@ -194,7 +213,12 @@ app.get('/admin/best-profession', getProfile, async (req, res) => {
 });
 
 /**
- * @returns ...
+ * Returns the clients that paid the most for jobs in the query time period requested
+ * @param {start}
+ * @param {end}
+ * @param {limit}
+ * @example GET: /admin/best-clients?start=2019-02-16&end=2024-02-16&limit=2
+ * @returns the list of clients
  */
 app.get('/admin/best-clients', getProfile, async (req, res) => {
     const { Job, Contract, Profile } = req.app.get('models');
