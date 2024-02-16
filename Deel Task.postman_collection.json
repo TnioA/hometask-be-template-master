@@ -1,0 +1,210 @@
+{
+	"info": {
+		"_postman_id": "56d1069a-b531-4d5b-8d00-bcb2c98ef487",
+		"name": "Deel Task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26827927"
+	},
+	"item": [
+		{
+			"name": "Get contracts for User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/contracts",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"contracts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profession that earned the most money",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/admin/best-profession?start=2019-02-16&end=2024-02-16",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"admin",
+						"best-profession"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2019-02-16"
+						},
+						{
+							"key": "end",
+							"value": "2024-02-16"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clients that paid the most for jobs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/admin/best-clients?start=2019-02-16&end=2024-02-16&limit=4",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"admin",
+						"best-clients"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2019-02-16"
+						},
+						{
+							"key": "end",
+							"value": "2024-02-16"
+						},
+						{
+							"key": "limit",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get contract by Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/contracts/1",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"contracts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get unpaid Jobs for User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/jobs/unpaid",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"jobs",
+						"unpaid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay for a job",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/jobs/2/pay",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"jobs",
+						"2",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposits money into the balance of a client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/balances/deposit/1/amount/100",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"balances",
+						"deposit",
+						"1",
+						"amount",
+						"100"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{profile_id}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "profile_id",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api-url",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "profile_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
