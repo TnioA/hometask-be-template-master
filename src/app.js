@@ -48,7 +48,6 @@ app.get('/contracts', getProfile, async (req, res) => {
 
 /**
  * Returns all unpaid jobs that belongs to the user
- * @param {id}
  * @example GET: /jobs/unpaid
  * @returns a list of jobs
  */
