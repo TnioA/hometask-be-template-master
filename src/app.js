@@ -3,9 +3,12 @@ const bodyParser = require('body-parser');
 const { sequelize, op } = require('./model');
 const { getProfile } = require('./middleware/getProfile');
 const app = express();
-app.use(bodyParser.json());
 app.set('sequelize', sequelize);
 app.set('models', sequelize.models);
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../docs/swagger.json');
+app.use(bodyParser.json());
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /**
  * Returns a contract by id that belongs to the user
@@ -14,6 +17,8 @@ app.set('models', sequelize.models);
  * @returns the contract
  */
 app.get('/contracts/:id', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+
     const { Contract } = req.app.get('models');
     const { id } = req.params;
     const profileId = req.profile.id;
@@ -35,6 +40,8 @@ app.get('/contracts/:id', getProfile, async (req, res) => {
  * @returns a list of contracts
  */
 app.get('/contracts', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+
     const { Contract } = req.app.get('models');
     const profileId = req.profile.id;
 
@@ -52,6 +59,8 @@ app.get('/contracts', getProfile, async (req, res) => {
  * @returns a list of jobs
  */
 app.get('/jobs/unpaid', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+
     const { Job, Contract } = req.app.get('models');
     const profileId = req.profile.id;
 
@@ -75,6 +84,8 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
  * @returns the confirmation message
  */
 app.post('/jobs/:jobId/pay', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+
     const { Job, Contract, Profile } = req.app.get('models');
     const { jobId } = req.params;
     const profileId = req.profile.id;
@@ -129,6 +140,8 @@ app.post('/jobs/:jobId/pay', getProfile, async (req, res) => {
  * @returns the confirmation message
  */
 app.post('/balances/deposit/:userId/amount/:depositValue', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+
     const { Job, Contract, Profile } = req.app.get('models');
     const { userId, depositValue } = req.params;
     const profileId = req.profile.id;
@@ -174,6 +187,8 @@ app.post('/balances/deposit/:userId/amount/:depositValue', getProfile, async (re
  * @returns the profession
  */
 app.get('/admin/best-profession', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+
     const { Job, Contract, Profile } = req.app.get('models');
     const { start, end } = req.query;
 
@@ -221,6 +236,8 @@ app.get('/admin/best-profession', getProfile, async (req, res) => {
  * @returns the list of clients
  */
 app.get('/admin/best-clients', getProfile, async (req, res) => {
+    /* #swagger.security = [{"apiKeyAuth": []}] */
+    
     const { Job, Contract, Profile } = req.app.get('models');
     const { start, end, limit } = req.query;
 
