@@ -85,6 +85,11 @@ Below is a list of the required API's for the application.
 ]
 ```
 
+## UnitTest Coverage Check
+
+1.  To start coverage Check just run the command below `npm test`
+1.  You should see all the information of unit tests and the coverage result at the console
+
 ## Test The API
 
 - To realize tests at the APIs, there is a Postman collection with information to integrate with the all endpoints
