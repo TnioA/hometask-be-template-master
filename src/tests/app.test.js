@@ -3,20 +3,24 @@ const app = require("../app");
 const { sequelize } = require('../model');
 const { getProfile } = require('../middleware/getProfile');
 
+// Global Mocks
+
 jest.mock('../model');
 jest.mock('../middleware/getProfile');
 
 const mockTransaction = jest.fn().mockResolvedValue({ rollback: () => null, commit: () => null });
 sequelize.transaction = mockTransaction;
 
+getProfile.mockImplementation((req, res, next) => {
+    req.profile = { id: 1 };
+    next();
+});
+
+// Api mocks
+
 describe('GET /contracts/:id', () => {
     it('should Return error', async () => {
         // Arrange
-        getProfile.mockImplementation((req, res, next) => {
-            req.profile = { id: 1 };
-            next();
-        });
-
         const findOneMock = jest.fn().mockResolvedValue(null);
         sequelize.models.Contract.findOne = findOneMock;
 
@@ -29,11 +33,6 @@ describe('GET /contracts/:id', () => {
 
     it('should Return a contract by id', async () => {
         // Arrange
-        getProfile.mockImplementation((req, res, next) => {
-            req.profile = { id: 1 };
-            next();
-        });
-
         const mockedContract = {
             id: 1,
             terms: 'bla bla bla',
@@ -56,11 +55,6 @@ describe('GET /contracts/:id', () => {
 describe('GET /contracts', () => {
     it('should return a list of contracts', async () => {
         // Arrange
-        getProfile.mockImplementation((req, res, next) => {
-            req.profile = { id: 1 };
-            next();
-        });
-
         const mockedContracts = [{
             id: 1,
             terms: 'bla bla bla',
@@ -83,11 +77,6 @@ describe('GET /contracts', () => {
 describe('GET /jobs/unpaid', () => {
     it('should return a list of unpaid jobs', async () => {
         // Arrange
-        getProfile.mockImplementation((req, res, next) => {
-            req.profile = { id: 1 };
-            next();
-        });
-
         const mockedJobs = [{
             id: 1,
             description: 'Luiz',
@@ -109,11 +98,6 @@ describe('GET /jobs/unpaid', () => {
 });
 
 describe('POST /jobs/:jobId/pay', () => {
-    getProfile.mockImplementation((req, res, next) => {
-        req.profile = { id: 1 };
-        next();
-    });
-
     it('should return error because job was not found', async () => {
         // Arrange
         const findOneMock = jest.fn().mockResolvedValue(null);
@@ -194,13 +178,16 @@ describe('POST /jobs/:jobId/pay', () => {
 });
 
 describe('POST /balances/deposit/:userId/amount/:depositValue', () => {
-    it('should realize a deposit at the profile balance', async () => {
-        // Arrange
-        getProfile.mockImplementation((req, res, next) => {
-            req.profile = { id: 1 };
-            next();
-        });
+    it('should return error because user is not the same of auth', async () => {
+        // Action
+        const response = await request(app).post('/balances/deposit/2/amount/100');
 
+        // Assert
+        expect(response.status).toBe(400);
+    });
+
+    it('should return error because deposit value is bigger than 25% of jobs amount', async () => {
+        // Arrange
         const mockedJobs = [{
             id: 1,
             description: 'Luiz',
@@ -211,12 +198,85 @@ describe('POST /balances/deposit/:userId/amount/:depositValue', () => {
         }];
         const findAllMock = jest.fn().mockResolvedValue(mockedJobs);
         sequelize.models.Job.findAll = findAllMock;
+        sequelize.models.Profile.increment = jest.fn().mockResolvedValue(null);
 
         // Action
-        const response = await request(app).get('/balances/deposit/1/amount/1');
+        const response = await request(app).post('/balances/deposit/1/amount/100');
+
+        // Assert
+        expect(response.status).toBe(400);
+    });
+
+    it('should realize a deposit at the profile balance', async () => {
+        // Arrange
+        const mockedJobs = [{
+            id: 1,
+            description: 'Luiz',
+            price: 1000,
+            paid: true,
+            paymentDate: '2020-08-14T23:11:26.737Z',
+            Contractid: 1
+        }];
+        const findAllMock = jest.fn().mockResolvedValue(mockedJobs);
+        sequelize.models.Job.findAll = findAllMock;
+        sequelize.models.Profile.increment = jest.fn().mockResolvedValue(null);
+
+        // Action
+        const response = await request(app).post('/balances/deposit/1/amount/100');
 
         // Assert
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(mockedJobs);
+    });
+});
+
+describe('GET /admin/best-profession', () => {
+    it('should return error because could not find the best profession', async () => {
+        // Arrange
+        const findOneMock = jest.fn().mockResolvedValue(null);
+        sequelize.models.Job.findOne = findOneMock;
+
+        // Action
+        const response = await request(app).get('/admin/best-profession?start=2019-02-16&end=2024-02-16');
+
+        // Assert
+        expect(response.status).toBe(404);
+    });
+
+    it('should return the profession that earned the most money', async () => {
+        // Arrange
+        const mockedResult = {
+            bestProfession: "programmer"
+        };
+        const findOneMock = jest.fn().mockResolvedValue(mockedResult);
+        sequelize.models.Job.findOne = findOneMock;
+
+        // Action
+        const response = await request(app).get('/admin/best-profession?start=2019-02-16&end=2024-02-16');
+
+        // Assert
+        expect(response.status).toBe(200);
+        expect(response.body.bestProfession).toEqual("programmer");
+    });
+});
+
+describe('GET /admin/best-clients', () => {
+    it('should return the clients that paid the most for jobs', async () => {
+        // Arrange
+        const mockedResult = [
+            {
+                id: 1,
+                fullName: "Reece Moyer",
+                paid: 100.3
+            }
+        ];
+        const findAllMock = jest.fn().mockResolvedValue(mockedResult);
+        sequelize.models.Job.findAll = findAllMock;
+
+        // Action
+        const response = await request(app).get('/admin/best-clients?start=2019-02-16&end=2024-02-16&limit=4');
+
+        // Assert
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockedResult);
     });
 });
