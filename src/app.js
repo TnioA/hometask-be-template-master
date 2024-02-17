@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { sequelize, op } = require('./model')
-const { getProfile } = require('./middleware/getProfile')
+const { sequelize, op } = require('./model');
+const { getProfile } = require('./middleware/getProfile');
 const app = express();
 app.use(bodyParser.json());
-app.set('sequelize', sequelize)
-app.set('models', sequelize.models)
+app.set('sequelize', sequelize);
+app.set('models', sequelize.models);
 
 /**
  * Returns a contract by id that belongs to the user
@@ -93,6 +93,7 @@ app.post('/jobs/:jobId/pay', getProfile, async (req, res) => {
         lock: true,
         transaction
     });
+
     if (!job) {
         await transaction.rollback();
         return res.status(404).json({ error: `The job was not found or has already been paid` });
