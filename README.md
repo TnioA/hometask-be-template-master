@@ -88,12 +88,13 @@ Below is a list of the required API's for the application.
 ## UnitTest Coverage Check
 
 1.  To start coverage Check just run the command below `npm test`.
-1.  You should see all the information of unit tests and the coverage result at the console.
+1.  You should see all the information of unit tests and the coverage result at the terminal.
 
 ## Test The API
 
 1. To realize tests at the APIs, there is a Postman collection with information to integrate with the all endpoints.
 1. The postman json file is: `Deel Task.postman_collection.json`.
+1. Just import it to your Postman and enjoy it.
 
 ## API Documentation
 
